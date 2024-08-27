@@ -56,8 +56,12 @@ export class SendMessageController implements Controller {
       } while (status !== 'completed');
 
       const receivedMessage = await this.messageGetter.get(threadId);
-      return ok(receivedMessage);
+      return ok({
+        receivedMessage,
+        threadId
+      });
     } catch (error) {
+      console.log(error);
       return serverError(error)
     }
   }

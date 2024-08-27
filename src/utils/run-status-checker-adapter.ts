@@ -13,14 +13,19 @@ export class RunStatusCheckerAdapter implements RunStatusChecker {
   }
 
   async check(threadId: string, runId: string): Promise<string> {
-    const response = await axios.post(`https://api.openai.com/v1/threads/${threadId}/runs/${runId}`, {}, {
-      headers: {
-        'Authorization': `Bearer ${this.authorizationKey}`,
-        'Content-Type': 'application/json',
-        'OpenAI-Organization': this.OpenAIOrganization,
-        'OpenAI-Beta': this.OpenAIBetaVersion
-      }
-    })
-    return response.data.status;
+    try {
+      const response = await axios.post(`https://api.openai.com/v1/threads/${threadId}/runs/${runId}`, {}, {
+        headers: {
+          'Authorization': `Bearer ${this.authorizationKey}`,
+          'Content-Type': 'application/json',
+          'OpenAI-Organization': this.OpenAIOrganization,
+          'OpenAI-Beta': this.OpenAIBetaVersion
+        }
+      })
+      return response.data.status;
+    } catch (error) {
+      console.log(error.response.data);
+    }
+
   }
 }
