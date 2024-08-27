@@ -1,0 +1,26 @@
+{
+  "name": "open-ai-integration-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec sucrase-node src/main/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "fast-glob": "^3.3.2",
+    "find-config": "^1.0.0",
+    "openai": "^4.56.0",
+    "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "sucrase-node": "^3.35.0",
+    "tsx": "^4.19.0"
+  }
+}
