@@ -1,6 +1,6 @@
 import axios from "axios";
-import { AssistantRunner } from "../presentation/protocols/assistant-runner";
 import { MessageGetter } from "../presentation/protocols/message-getter";
+import { AssistantMessageModel } from "../domain/models/assistant-message";
 
 export class MessageGetterAdapter implements MessageGetter {
   private readonly authorizationKey: string
@@ -13,7 +13,7 @@ export class MessageGetterAdapter implements MessageGetter {
     this.OpenAIBetaVersion = OpenAIBetaVersion
   }
 
-  async get(threadId: string): Promise<any> {
+  async get(threadId: string): Promise<AssistantMessageModel> {
     const response = await axios.get(`https://api.openai.com/v1/threads/${threadId}/messages`, {
       headers: {
         'Authorization': `Bearer ${this.authorizationKey}`,
@@ -22,6 +22,10 @@ export class MessageGetterAdapter implements MessageGetter {
         'OpenAI-Beta': this.OpenAIBetaVersion
       }
     })
-    return response.data.data[0].content[0].text.value;
+    const message : AssistantMessageModel = {
+      id: response.data.data[0].id,
+      content: response.data.data[0].content[0].text.value
+    };
+    return message;
   }
 }

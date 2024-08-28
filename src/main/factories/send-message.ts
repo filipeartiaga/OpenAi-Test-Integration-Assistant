@@ -1,3 +1,7 @@
+import { AddMessageMongoRepository } from "../../infra/mongodb/message/add-message";
+import { AddThreadMongoRepository } from "../../infra/mongodb/message/add-thread";
+import { GetThreadMongoRepository } from "../../infra/mongodb/message/get-thread";
+import { UpdateThreadMongoRepository } from "../../infra/mongodb/message/update-thread";
 import { SendMessageController } from "../../presentation/controllers/send-message";
 import { AssistantRunnerAdapter } from "../../utils/assistant-runner-adapter";
 import { MessageGetterAdapter } from "../../utils/message-getter-adapter";
@@ -16,6 +20,11 @@ export const makeSendMessageController = (): SendMessageController => {
   const assistantRunnerAdapter = new AssistantRunnerAdapter(authorizationKey, OpenAIOrganization, OpenAIBetaVersion, env.assistantId);
   const runStatusCheckerAdapter = new RunStatusCheckerAdapter(authorizationKey, OpenAIOrganization, OpenAIBetaVersion);
   const messageGetterAdapter = new MessageGetterAdapter(authorizationKey, OpenAIOrganization, OpenAIBetaVersion, env.assistantId);
+  const addMessageMongoRepository = new AddMessageMongoRepository();
+  const getThreadMongoRepository = new GetThreadMongoRepository();
+  const addThreadMongoRepository = new AddThreadMongoRepository();
+  const updateThreadMongoRepository = new UpdateThreadMongoRepository();
 
-  return new SendMessageController(threadCreatorAdapter, messageSenderAdapter, assistantRunnerAdapter, runStatusCheckerAdapter, messageGetterAdapter);
+  return new SendMessageController(threadCreatorAdapter, messageSenderAdapter, assistantRunnerAdapter, runStatusCheckerAdapter,
+     messageGetterAdapter, addMessageMongoRepository, getThreadMongoRepository, addThreadMongoRepository, updateThreadMongoRepository);
 }
