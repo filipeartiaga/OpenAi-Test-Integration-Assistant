@@ -1,4 +1,3 @@
-import { ThreadModel } from "../../domain/models/thread"
 import { AddMessageModel } from "../../domain/usecases/add-message"
 import { AddThreadModel } from "../../domain/usecases/add-thread"
 import { MissingParamError } from "../errors/missing-param-error"
@@ -6,14 +5,9 @@ import { badRequest, ok, serverError } from "../helpers/http-helper"
 import { AssistantRunner } from "../protocols/assistant-runner"
 import { Controller } from "../protocols/controller"
 import { HttpRequest, HttpResponse } from "../protocols/http"
-import { MessageAdder } from "../protocols/message-adder"
-import { MessageGetter } from "../protocols/message-getter"
-import { MessageSender } from "../protocols/message-sender"
+import { MessageAdder, MessageGetter, MessageSender } from "../protocols/message"
 import { RunStatusChecker } from "../protocols/run-status-checker"
-import { ThreadAdder } from "../protocols/thread-adder"
-import { ThreadCreator } from "../protocols/thread-creator"
-import { ThreadGetter } from "../protocols/thread-getter"
-import { ThreadUpdater } from "../protocols/thread-updater"
+import { ThreadAdder, ThreadCreator, ThreadGetter, ThreadUpdater } from "../protocols/thread"
 
 export class SendMessageController implements Controller {
 
@@ -26,7 +20,6 @@ export class SendMessageController implements Controller {
   private readonly threadGetter: ThreadGetter;
   private readonly threadAdder: ThreadAdder;
   private readonly threadUpdater: ThreadUpdater;
-
 
   constructor(threadCreator: ThreadCreator, messageSender: MessageSender, assistantRunner: AssistantRunner,
     runStatusChecker: RunStatusChecker, messageGetter: MessageGetter, messageAdder: MessageAdder, threadGetter: ThreadGetter,
