@@ -1,5 +1,5 @@
-import { ThreadModel } from "../../domain/models/thread";
+import { ThreadModel } from "../../../domain/models/thread";
 
 export interface ThreadUpdater {
-  update(thread: ThreadModel): Promise<string>
+  update(thread: ThreadModel): Promise<ThreadModel>
 }
