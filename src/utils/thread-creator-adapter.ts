@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ThreadCreator } from "../presentation/protocols/thread-creator";
+import { ThreadCreator } from "../presentation/protocols/thread";
 
 export class ThreadCreatorAdapter implements ThreadCreator {
   private readonly authorizationKey: string

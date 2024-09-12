@@ -1,6 +1,6 @@
 import axios from "axios";
-import { MessageGetter } from "../presentation/protocols/message-getter";
 import { AssistantMessageModel } from "../domain/models/assistant-message";
+import { MessageGetter } from "../presentation/protocols/message";
 
 export class MessageGetterAdapter implements MessageGetter {
   private readonly authorizationKey: string

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { MessageSender } from "../presentation/protocols/message-sender";
+import { MessageSender } from "../presentation/protocols/message";
 
 export class MessageSenderAdapter implements MessageSender {
   private readonly authorizationKey: string
