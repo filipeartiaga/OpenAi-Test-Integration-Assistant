@@ -37,7 +37,7 @@ export class SendMessageController implements Controller {
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const requiredFields = ['message']
+      const requiredFields = ['message', 'phoneNumber']
       for (const field of requiredFields) {
         if (!httpRequest.body[field]) {
           return badRequest(new MissingParamError(field))
@@ -45,9 +45,12 @@ export class SendMessageController implements Controller {
       }
 
       const { message } = httpRequest.body
-      let threadId = httpRequest.body.threadId
+      
+      let phoneNumber = httpRequest.body.phoneNumber
+      let thread = await this.threadGetter.getByPhoneNumber(phoneNumber)
+      let threadId = thread?.threadId
 
-      if (!threadId) {
+      if(!thread) {
         threadId = await this.threadCreator.create()
       }
 
@@ -85,21 +88,20 @@ export class SendMessageController implements Controller {
       }
       const receivedMessageData = await this.messageAdder.add(receivedMessageModel);
 
-      const threadInDatabase = await this.threadGetter.get(threadId);
+      const threadInDatabase = await this.threadGetter.getByThreadId(threadId);
 
       if (!threadInDatabase) {
         const threadData: AddThreadModel = {
+          phoneNumber: phoneNumber,
           threadId,
           messages: [sentMessageData.id, receivedMessageData.id],
           createdAt: new Date(now),
         }
         await this.threadAdder.add(threadData);
       } else {
-        console.log("updating: ", threadInDatabase);
         threadInDatabase.messages.push(sentMessageData.id);
         threadInDatabase.messages.push(receivedMessageData.id);
         const thread = await this.threadUpdater.update(threadInDatabase);
-        console.log(thread);
       }
 
       return ok({

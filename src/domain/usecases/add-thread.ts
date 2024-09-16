@@ -1,5 +1,6 @@
 export interface AddThreadModel {
   threadId: string
+  phoneNumber: string
   messages: string[]
   createdAt: Date
 }

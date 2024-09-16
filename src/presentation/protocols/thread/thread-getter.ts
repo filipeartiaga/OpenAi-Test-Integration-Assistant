@@ -1,5 +1,6 @@
-import { ThreadModel } from "../../domain/models/thread";
+import { ThreadModel } from "../../../domain/models/thread"
 
 export interface ThreadGetter {
-  get(threadId: string): Promise<ThreadModel>
+  getByThreadId(threadId: string): Promise<ThreadModel>
+  getByPhoneNumber(phoneNumber: string): Promise<ThreadModel>
 }
