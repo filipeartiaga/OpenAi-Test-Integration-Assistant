@@ -37,39 +37,46 @@ export class SendMessageController implements Controller {
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const requiredFields = ['message', 'phoneNumber']
+      const requiredFields = ['message']
       for (const field of requiredFields) {
         if (!httpRequest.body[field]) {
           return badRequest(new MissingParamError(field))
         }
       }
 
-      const { message } = httpRequest.body
+      const { message, threadId } = httpRequest.body
       
-      let phoneNumber = httpRequest.body.phoneNumber
-      let thread = await this.threadGetter.getByPhoneNumber(phoneNumber)
-      let threadId = thread?.threadId
+      let thread = null
 
-      if(!thread) {
-        threadId = await this.threadCreator.create()
+      if(threadId){
+        thread = await this.threadGetter.getByThreadId(threadId)
       }
 
-      const sentMessageId = await this.messageSender.send(message, threadId)
+      if(!thread) {
+        const threadId = await this.threadCreator.create()
+        thread = {
+          id: '',
+          threadId,
+          messages: []
+        }
+      }
+
+      const sentMessageId = await this.messageSender.send(message, thread.threadId)
 
       if (!sentMessageId) {
         return serverError(new Error('Failed to send message to assistant'))
       }
 
-      const runId = await this.assistantRunner.run(threadId);
+      const runId = await this.assistantRunner.run(thread.threadId);
 
       let status = '';
       do {
         await new Promise(resolve => setTimeout(resolve, 5000));
-        status = await this.runStatusChecker.check(threadId, runId);
+        status = await this.runStatusChecker.check(thread.threadId, runId);
         console.log("status:" + status);
       } while (status !== 'completed');
 
-      const receivedMessage = await this.messageGetter.get(threadId);
+      const receivedMessage = await this.messageGetter.get(thread.threadId);
       const now = Date.now();
 
       const sentMessage: AddMessageModel = {
@@ -88,12 +95,11 @@ export class SendMessageController implements Controller {
       }
       const receivedMessageData = await this.messageAdder.add(receivedMessageModel);
 
-      const threadInDatabase = await this.threadGetter.getByThreadId(threadId);
+      const threadInDatabase = await this.threadGetter.getByThreadId(thread.threadId);
 
       if (!threadInDatabase) {
         const threadData: AddThreadModel = {
-          phoneNumber: phoneNumber,
-          threadId,
+          threadId: thread.threadId,
           messages: [sentMessageData.id, receivedMessageData.id],
           createdAt: new Date(now),
         }
@@ -101,12 +107,12 @@ export class SendMessageController implements Controller {
       } else {
         threadInDatabase.messages.push(sentMessageData.id);
         threadInDatabase.messages.push(receivedMessageData.id);
-        const thread = await this.threadUpdater.update(threadInDatabase);
+        await this.threadUpdater.update(threadInDatabase);
       }
 
       return ok({
         receivedMessage,
-        threadId
+        threadId: thread.threadId
       });
     } catch (error) {
       console.log("error: ", error);
